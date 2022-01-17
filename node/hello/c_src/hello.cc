@@ -72,13 +72,13 @@ void Sum(const FunctionCallbackInfo<Value>& args) {
     args.GetReturnValue().Set(sum);
 }
 
-// Add addons must export an initialization function
-void Initialize(Local<Object> exports) {
+// All addons must export an initialization function
+void Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "hello", Hello);
     NODE_SET_METHOD(exports, "add", Add);
     NODE_SET_METHOD(exports, "sum", Sum);
 }
 
-NODE_MODULE(NODE_GYP_MODULE_NAME, Initialize) // no semi-colon here!
+NODE_MODULE(NODE_GYP_MODULE_NAME, Init) // no semi-colon here!
 
 } // namespace demo
