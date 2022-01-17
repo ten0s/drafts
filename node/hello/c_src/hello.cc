@@ -13,6 +13,36 @@ void Hello(const FunctionCallbackInfo<Value>& args) {
     retVal.Set(checkedStr);
 }
 
+void Add(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+
+    if (args.Length() < 2) {
+        isolate->ThrowException(
+            Exception::TypeError(
+                String::NewFromUtf8(
+                    isolate,
+                    "Wrong number of arguments",
+                    NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+
+    if (!args[0]->IsNumber() || !args[1]->IsNumber()) {
+        isolate->ThrowException(
+            Exception::TypeError(
+                String::NewFromUtf8(
+                    isolate,
+                    "Wrong arguments",
+                    NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+
+    double sum = args[0].As<Number>()->Value()
+               + args[1].As<Number>()->Value();
+
+    Local<Number> res = Number::New(isolate, sum);
+    args.GetReturnValue().Set(res);
+}
+
 void Sum(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
@@ -38,13 +68,14 @@ void Sum(const FunctionCallbackInfo<Value>& args) {
         }
     }
 
-    Local<Number> res = Number::New(isolate, sum);
-    args.GetReturnValue().Set(res);
+    // Without Local<Number> handler
+    args.GetReturnValue().Set(sum);
 }
 
 // Add addons must export an initialization function
 void Initialize(Local<Object> exports) {
     NODE_SET_METHOD(exports, "hello", Hello);
+    NODE_SET_METHOD(exports, "add", Add);
     NODE_SET_METHOD(exports, "sum", Sum);
 }
 
