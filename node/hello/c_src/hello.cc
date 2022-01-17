@@ -72,11 +72,38 @@ void Sum(const FunctionCallbackInfo<Value>& args) {
     args.GetReturnValue().Set(sum);
 }
 
+void CallFun0(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+
+    Local<Function> cb = Local<Function>::Cast(args[0]);
+    cb->Call(context, Null(isolate), 0, nullptr).ToLocalChecked();
+
+    // Will return undefined
+    return;
+}
+
+void CallFun1(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+
+    Local<Function> cb = Local<Function>::Cast(args[0]);
+    const unsigned argc = 1;
+    Local<Value> argv[argc] = { args[1] };
+    Local<Value> res = cb->Call(
+        context, Null(isolate), argc, argv).ToLocalChecked();
+
+    // Return what callback returned
+    args.GetReturnValue().Set(res);
+}
+
 // All addons must export an initialization function
 void Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "hello", Hello);
     NODE_SET_METHOD(exports, "add", Add);
     NODE_SET_METHOD(exports, "sum", Sum);
+    NODE_SET_METHOD(exports, "callFun0", CallFun0);
+    NODE_SET_METHOD(exports, "callFun1", CallFun1);
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Init) // no semi-colon here!

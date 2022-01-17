@@ -35,4 +35,10 @@ try {
     }
 }
 
+console.log(addon.callFun0(() => {
+    console.log('I\'ve been called!')
+}))
+
+console.log(addon.callFun1((n) => 1 + n, 10))
+
 console.log('OK')
