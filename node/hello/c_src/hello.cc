@@ -39,8 +39,7 @@ void Sum(const FunctionCallbackInfo<Value>& args) {
     }
 
     Local<Number> res = Number::New(isolate, sum);
-    ReturnValue<Value> retVal = args.GetReturnValue();
-    retVal.Set(res);
+    args.GetReturnValue().Set(res);
 }
 
 // Add addons must export an initialization function
