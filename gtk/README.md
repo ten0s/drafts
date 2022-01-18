@@ -1,11 +1,10 @@
-
 ## Ubuntu
 
 ```
-$ make -f Makefile.linux init
-$ make -f Makefile.linux compile
-$ make -f Makefile.linux run
-$ make -f Makefile.linux clean
+$ make -f Makefile.ubuntu init
+$ make -f Makefile.ubuntu compile
+$ make -f Makefile.ubuntu run
+$ make -f Makefile.ubuntu clean
 ```
 
 ```
