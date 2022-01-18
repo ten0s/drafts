@@ -1,0 +1,21 @@
+# -*- mode: makefile -*-
+
+all: compile
+
+init:
+	pacman --noconfirm -S --needed base-devel mingw-w64-x86_64-toolchain
+	pacman --noconfirm -S mingw-w64-x86_64-gtk3 mingw-w64-x86_64-glade
+
+compile: hello-gtk.exe hello-gtk-cairo.exe
+
+run: compile
+	./hello-gtk && ./hello-gtk-cairo
+
+hello-gtk.exe:
+	gcc -o hello-gtk hello-gtk.c `pkg-config --libs --cflags gtk+-3.0`
+
+hello-gtk-cairo.exe:
+	gcc -o hello-gtk-cairo hello-gtk-cairo.c `pkg-config --libs --cflags gtk+-3.0`
+
+clean:
+	rm -f hello-gtk.exe hello-gtk-cairo.exe
