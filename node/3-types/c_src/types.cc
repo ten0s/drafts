@@ -16,23 +16,23 @@ void PassNumber(const FunctionCallbackInfo<Value>& args) {
     }
 
     //double num = args[0].As<Number>()->Value();
-    double num = 0;
-    Maybe<double> mbNum = args[0]->NumberValue(context);
-    if (mbNum.IsJust()) {
-        num = mbNum.FromJust();
+    double val = 0;
+    Maybe<double> mbVal = args[0]->NumberValue(context);
+    if (mbVal.IsJust()) {
+        val = mbVal.FromJust();
     }
 
-    //std::cout << num << std::endl;
-    args.GetReturnValue().Set(num + 42);
+    //std::cout << val << std::endl;
+    args.GetReturnValue().Set(val + 42);
 }
 
 void PassInt32(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
     Local<Context> context = isolate->GetCurrentContext();
 
-    Maybe<int32_t> mbI32 = args[0]->Int32Value(context);
-    if (mbI32.IsJust()) {
-        args.GetReturnValue().Set(mbI32.FromJust() + 42);
+    Maybe<int32_t> mbVal = args[0]->Int32Value(context);
+    if (mbVal.IsJust()) {
+        args.GetReturnValue().Set(mbVal.FromJust() + 42);
         return;
     }
 
@@ -42,10 +42,10 @@ void PassInt32(const FunctionCallbackInfo<Value>& args) {
 void PassBoolean(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
-    bool bul = args[0]->BooleanValue(isolate);
-    //std::cout << bul << std::endl;
+    bool val = args[0]->BooleanValue(isolate);
+    //std::cout << val << std::endl;
 
-    args.GetReturnValue().Set(bul);
+    args.GetReturnValue().Set(val);
 }
 
 void Mutate(const FunctionCallbackInfo<Value>& args) {
