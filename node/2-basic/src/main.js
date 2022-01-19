@@ -1,6 +1,4 @@
-const addon = require('../build/Release/hello.node')
-
-console.log(addon.hello())
+const addon = require('../build/Release/basic')
 
 try {
     console.log('add(1)')
