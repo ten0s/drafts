@@ -1,6 +1,7 @@
 #include <node.h>
 #include <iostream>
-#include <cmath> // NAN
+#include <cmath>     // NAN
+#include <algorithm> // std::reverse
 
 namespace demo {
 
@@ -48,17 +49,71 @@ void PassBoolean(const FunctionCallbackInfo<Value>& args) {
     args.GetReturnValue().Set(val);
 }
 
-void Mutate(const FunctionCallbackInfo<Value>& args) {
+void PassString(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+
+    if (args[0]->IsNull()) {
+        args.GetReturnValue().Set(Null(isolate));
+        return;
+    }
+
+    if (args[0]->IsUndefined()) {
+        // Will return undefined
+        return;
+    }
+
+    // Catches Object, Array, Function, Regex
+    if (args[0]->IsObject()) {
+        args.GetReturnValue().Set(args[0]);
+        return;
+    }
+
+    String::Utf8Value s(isolate, args[0]);
+
+    std::string str(*s);
+    std::reverse(str.begin(), str.end());
+
+    Local<String> ret = String::NewFromUtf8(
+        isolate, str.c_str(), NewStringType::kNormal).ToLocalChecked();
+
+    args.GetReturnValue().Set(ret);
+}
+
+void PassObject(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
     Local<Context> context = isolate->GetCurrentContext();
 
-    Local<Object> target = args[0].As<Object>();
-    target->Set(context,
-                String::NewFromUtf8(
-                    isolate, "y", NewStringType::kNormal).ToLocalChecked(),
-                Number::New(isolate, 42));
+    Local<Object> obj = args[0].As<Object>();
 
-    args.GetReturnValue().Set(target);
+    Local<String> prop_y = String::NewFromUtf8(
+        isolate, "y", NewStringType::kNormal).ToLocalChecked();
+
+    double y;
+    if (obj->Get(context, prop_y).IsEmpty()) {
+        //printf("Is empty\n");
+        y = 0;
+    } else {
+        //y = obj->Get(context, prop_y).ToLocalChecked().As<Number>()->Value();
+        Local<Value> val = obj->Get(context, prop_y).ToLocalChecked();
+        if (val->IsUndefined()) {
+            // Key doesn't exit
+            //printf("Is undefined\n");
+            y = 0;
+        } else {
+            // Still converts string -> NAN
+            Maybe<double> mbDbl = val->NumberValue(context);
+            if (mbDbl.IsNothing()) {
+                //printf("Is nothing\n");
+                y = 0;
+            } else {
+                y = mbDbl.FromJust();
+                //printf("y = %f\n", y);
+            }
+        }
+    }
+
+    obj->Set(context, prop_y, Number::New(isolate, y + 42));
+    args.GetReturnValue().Set(obj);
 }
 
 // All addons must export an initialization function
@@ -66,7 +121,8 @@ void Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "passNumber", PassNumber);
     NODE_SET_METHOD(exports, "passInt32", PassInt32);
     NODE_SET_METHOD(exports, "passBoolean", PassBoolean);
-    NODE_SET_METHOD(exports, "mutate", Mutate);
+    NODE_SET_METHOD(exports, "passString", PassString);
+    NODE_SET_METHOD(exports, "passObject", PassObject);
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Init) // no semi-colon here!

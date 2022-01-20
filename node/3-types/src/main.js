@@ -56,6 +56,23 @@ assert.ok(types.passBoolean({}))
 assert.ok(types.passBoolean([]))
 
 //
-// Mutate
+// PassString
 //
-assert.deepStrictEqual(types.mutate({x: 1, y: 2}), {x: 1, y: 42})
+assert.equal(types.passString(null), null)
+assert.equal(types.passString(undefined), undefined)
+assert.deepStrictEqual(types.passString({}), {})
+assert.deepStrictEqual(types.passString({x: 1}), {x: 1})
+
+assert.equal(types.passString(''), '')
+assert.equal(types.passString('abc'), 'cba')
+
+assert.equal(types.passString(10), '01')
+assert.equal(types.passString(10.0), '01')
+assert.equal(types.passString(10.1), '1.01')
+
+//
+// PassObject
+//
+assert.deepStrictEqual(types.passObject({x: 1}), {x: 1, y: 42})
+assert.deepStrictEqual(types.passObject({x: 1, y: 2}), {x: 1, y: 44})
+assert.deepStrictEqual(types.passObject({x: 1, y: "hello"}), {x: 1, y: NaN})
