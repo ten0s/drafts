@@ -88,6 +88,9 @@ void PassObject(const FunctionCallbackInfo<Value>& args) {
     Local<String> prop_y = String::NewFromUtf8(
         isolate, "y", NewStringType::kNormal).ToLocalChecked();
 
+    Local<String> prop_z = String::NewFromUtf8(
+        isolate, "z", NewStringType::kNormal).ToLocalChecked();
+
     double y;
     if (obj->Get(context, prop_y).IsEmpty()) {
         //printf("Is empty\n");
@@ -113,6 +116,7 @@ void PassObject(const FunctionCallbackInfo<Value>& args) {
     }
 
     obj->Set(context, prop_y, Number::New(isolate, y + 42));
+    obj->Set(context, prop_z, Number::New(isolate, -1));
     args.GetReturnValue().Set(obj);
 }
 
