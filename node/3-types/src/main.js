@@ -75,4 +75,18 @@ assert.equal(types.passString(10.1), '1.01')
 //
 assert.deepStrictEqual(types.passObject({x: 1}), {x: 1, y: 42, z: -1})
 assert.deepStrictEqual(types.passObject({x: 1, y: 2}), {x: 1, y: 44, z: -1})
+assert.deepStrictEqual(types.passObject({x: 1, y: "2"}), {x: 1, y: 44, z: -1})
 assert.deepStrictEqual(types.passObject({x: 1, y: "hello"}), {x: 1, y: NaN, z: -1})
+
+//
+// PassArray
+//
+assert.deepStrictEqual(types.passArray([]), [])
+assert.deepStrictEqual(types.passArray([1, "2", null]), [2, 3, 1])
+assert.deepStrictEqual(types.passArray([1, "two", 3.0, {}]), [2, NaN, 4.0, NaN])
+const arr = []
+arr[0] = 0
+arr[2] = "2"
+arr[3] = 3.0
+arr[4] = {}
+assert.deepStrictEqual(types.passArray(arr), [1, 2, 3, 4.0, NaN])

@@ -93,7 +93,6 @@ void PassObject(const FunctionCallbackInfo<Value>& args) {
 
     double y;
     if (obj->Has(context, prop_y).FromJust()) {
-        // Still converts string -> NAN
         //y = obj->Get(context, prop_y).ToLocalChecked().As<Number>()->Value();
         Maybe<double> mbDbl = obj->Get(context, prop_y).ToLocalChecked()->NumberValue(context);
         if (mbDbl.IsJust()) {
@@ -113,6 +112,23 @@ void PassObject(const FunctionCallbackInfo<Value>& args) {
     args.GetReturnValue().Set(obj);
 }
 
+void PassArray(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+
+    Local<Array> arr = Local<Array>::Cast(args[0]);
+    for (unsigned i = 0; i < arr->Length(); ++i) {
+        if (!arr->Has(context, i).FromJust()) {
+            arr->Set(context, i, Number::New(isolate, i));
+        }
+        //double val = arr->Get(i).As<Number>()->Value();
+        double val = arr->Get(i)->NumberValue(context).FromJust();
+        arr->Set(context, i, Number::New(isolate, val + 1));
+    }
+
+    args.GetReturnValue().Set(arr);
+}
+
 // All addons must export an initialization function
 void Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "passNumber", PassNumber);
@@ -120,6 +136,7 @@ void Init(Local<Object> exports) {
     NODE_SET_METHOD(exports, "passBoolean", PassBoolean);
     NODE_SET_METHOD(exports, "passString", PassString);
     NODE_SET_METHOD(exports, "passObject", PassObject);
+    NODE_SET_METHOD(exports, "passArray", PassArray);
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Init) // no semi-colon here!
