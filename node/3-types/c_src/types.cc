@@ -93,7 +93,6 @@ void PassObject(const FunctionCallbackInfo<Value>& args) {
 
     double y;
     if (obj->Has(context, prop_y).FromJust()) {
-        // Still converts string -> NAN
         //y = obj->Get(context, prop_y).ToLocalChecked().As<Number>()->Value();
         Maybe<double> mbDbl = obj->Get(context, prop_y).ToLocalChecked()->NumberValue(context);
         if (mbDbl.IsJust()) {
@@ -108,18 +107,44 @@ void PassObject(const FunctionCallbackInfo<Value>& args) {
         y = 0;
     }
 
-    obj->Set(context, prop_y, Number::New(isolate, y + 42));
-    obj->Set(context, prop_z, Number::New(isolate, -1));
+    if (obj->Set(context, prop_y, Number::New(isolate, y + 42)).IsNothing()) {
+        printf("obj->Set failed\n");
+    }
+    if (obj->Set(context, prop_z, Number::New(isolate, -1)).IsNothing()) {
+        printf("obj->Set failed\n");
+    }
     args.GetReturnValue().Set(obj);
 }
 
+void PassArray(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+
+    Local<Array> arr = Local<Array>::Cast(args[0]);
+    for (unsigned i = 0; i < arr->Length(); ++i) {
+        if (!arr->Has(context, i).FromJust()) {
+            if (arr->Set(context, i, Number::New(isolate, i)).IsNothing()) {
+                printf("arr->Set failed\n");
+            }
+        }
+        //double val = arr->Get(context, i).ToLocalChecked().As<Number>()->Value();
+        double val = arr->Get(context, i).ToLocalChecked()->NumberValue(context).FromJust();
+        if (arr->Set(context, i, Number::New(isolate, val + 1)).IsNothing()) {
+            printf("arr->Set failed\n");
+        }
+    }
+
+    args.GetReturnValue().Set(arr);
+}
+
 // All addons must export an initialization function
-void Init(Local<Object> exports) {
+void Init(Local<Object> exports, Local<Value> module, void* context) {
     NODE_SET_METHOD(exports, "passNumber", PassNumber);
     NODE_SET_METHOD(exports, "passInt32", PassInt32);
     NODE_SET_METHOD(exports, "passBoolean", PassBoolean);
     NODE_SET_METHOD(exports, "passString", PassString);
     NODE_SET_METHOD(exports, "passObject", PassObject);
+    NODE_SET_METHOD(exports, "passArray", PassArray);
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Init) // no semi-colon here!

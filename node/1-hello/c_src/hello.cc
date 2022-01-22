@@ -14,7 +14,7 @@ void Hello(const FunctionCallbackInfo<Value>& args) {
 }
 
 // All addons must export an initialization function
-void Init(Local<Object> exports) {
+void Init(Local<Object> exports, Local<Value> module, void* context) {
     NODE_SET_METHOD(exports, "hello", Hello);
 }
 
