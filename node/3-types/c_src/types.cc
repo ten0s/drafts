@@ -92,27 +92,20 @@ void PassObject(const FunctionCallbackInfo<Value>& args) {
         isolate, "z", NewStringType::kNormal).ToLocalChecked();
 
     double y;
-    if (obj->Get(context, prop_y).IsEmpty()) {
-        //printf("Is empty\n");
-        y = 0;
-    } else {
+    if (obj->Has(context, prop_y).FromJust()) {
+        // Still converts string -> NAN
         //y = obj->Get(context, prop_y).ToLocalChecked().As<Number>()->Value();
-        Local<Value> val = obj->Get(context, prop_y).ToLocalChecked();
-        if (val->IsUndefined()) {
-            // Key doesn't exit
-            //printf("Is undefined\n");
-            y = 0;
+        Maybe<double> mbDbl = obj->Get(context, prop_y).ToLocalChecked()->NumberValue(context);
+        if (mbDbl.IsJust()) {
+            y = mbDbl.FromJust();
+            //printf("y = %f\n", y);
         } else {
-            // Still converts string -> NAN
-            Maybe<double> mbDbl = val->NumberValue(context);
-            if (mbDbl.IsNothing()) {
-                //printf("Is nothing\n");
-                y = 0;
-            } else {
-                y = mbDbl.FromJust();
-                //printf("y = %f\n", y);
-            }
+            //printf("y is nothing\n");
+            y = 0;
         }
+    } else {
+        //printf("No 'y' key\n");
+        y = 0;
     }
 
     obj->Set(context, prop_y, Number::New(isolate, y + 42));
