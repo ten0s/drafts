@@ -39,8 +39,8 @@ Location unpack_location(Isolate* isolate, const Local<Context>& context, const 
     loc.longitude = Lon.As<Number>()->Value();
 
     Local<Array> Arr = Local<Array>::Cast(Obj->Get(context, NEW_STR("samples")).ToLocalChecked());
-    unsigned len = Arr->Length();
-    for (unsigned i = 0; i < len; ++i) {
+    size_t len = Arr->Length();
+    for (size_t i = 0; i < len; ++i) {
         Local<Object> Item = Arr->Get(context, i).ToLocalChecked().As<Object>();
         Sample s = unpack_sample(isolate, context, Item);
         loc.samples.push_back(s);
@@ -91,8 +91,8 @@ void CalcResults(const FunctionCallbackInfo<Value>& args) {
     std::vector<RainResult> results;
 
     Local<Array> Input = Local<Array>::Cast(args[0]);
-    unsigned len = Input->Length();
-    for (unsigned i = 0; i < len; ++i) {
+    size_t len = Input->Length();
+    for (size_t i = 0; i < len; ++i) {
         Local<Object> Item = Input->Get(context, i).ToLocalChecked().As<Object>();
         locations.push_back(unpack_location(isolate, context, Item));
     }

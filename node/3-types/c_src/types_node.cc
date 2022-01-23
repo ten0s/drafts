@@ -121,7 +121,8 @@ void PassArray(const FunctionCallbackInfo<Value>& args) {
     Local<Context> context = isolate->GetCurrentContext();
 
     Local<Array> arr = Local<Array>::Cast(args[0]);
-    for (unsigned i = 0; i < arr->Length(); ++i) {
+    size_t len = arr->Length();
+    for (size_t i = 0; i < len; ++i) {
         if (!arr->Has(context, i).FromJust()) {
             if (arr->Set(context, i, Number::New(isolate, i)).IsNothing()) {
                 printf("arr->Set failed\n");

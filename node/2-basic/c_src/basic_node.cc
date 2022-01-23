@@ -38,7 +38,8 @@ void Sum(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
     double sum = 0.0;
-    for (int i = 0; i< args.Length(); ++i) {
+    size_t len = args.Length();
+    for (size_t i = 0; i< len; ++i) {
         if (args[i]->IsNumber()) {
             sum += args[i].As<Number>()->Value();
         } else {
