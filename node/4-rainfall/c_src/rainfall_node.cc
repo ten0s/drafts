@@ -1,17 +1,26 @@
 #include <node.h>
+#include <uv.h>
+
 #include <algorithm>
 #include <iostream>
+#include <chrono>
+#include <thread>
+
 #include "rainfall.h"
 
 using v8::Array;
 using v8::Context;
+using v8::Exception;
+using v8::Function;
 using v8::FunctionCallbackInfo;
+using v8::HandleScope;
 using v8::Integer;
 using v8::Isolate;
 using v8::Local;
 using v8::NewStringType;
 using v8::Number;
 using v8::Object;
+using v8::Persistent;
 using v8::String;
 using v8::Value;
 
@@ -117,10 +126,145 @@ void CalcResults(const FunctionCallbackInfo<Value>& args) {
     args.GetReturnValue().Set(Results);
 }
 
+void CalcResultsSync(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+
+    if (args.Length() < 2) {
+        isolate->ThrowException(
+            Exception::TypeError(
+                String::NewFromUtf8(
+                    isolate,
+                    "Wrong number of arguments",
+                    NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+
+    // Unpack locations
+    std::vector<Location> locations;
+
+    Local<Array> Input = Local<Array>::Cast(args[0]);
+    size_t len = Input->Length();
+    for (size_t i = 0; i < len; ++i) {
+        Local<Object> Item = Input->Get(context, i).ToLocalChecked().As<Object>();
+        locations.push_back(unpack_location(isolate, context, Item));
+    }
+
+    // Callback
+    Local<Function> callback = Local<Function>::Cast(args[1]);
+
+    // Calc results
+    std::vector<RainResult> results;
+    calc_results(locations, /*out*/results);
+
+    // Pack results
+    Local<Array> Results = Array::New(isolate);
+    for (unsigned i = 0; i < len; ++i) {
+        Local<Object> Result = pack_rain_result(isolate, context, results[i]);
+        Results->Set(context, i, Result);
+    }
+
+    // Call callback
+    Local<Value> argv[] = { Results };
+    const unsigned argc = sizeof(argv) / sizeof(argv[0]);
+    callback->Call(context, Null(isolate), argc, argv).ToLocalChecked();
+
+    std::cerr << "Returning from C++ now" << std::endl;
+    args.GetReturnValue().Set(Undefined(isolate));
+}
+
+struct Work {
+    uv_work_t request;
+    Persistent<Function> callback;
+
+    std::vector<Location> locations;
+    std::vector<RainResult> results;
+};
+
+static void WorkAsync(uv_work_t* req) {
+    Work* work = static_cast<Work *>(req->data);
+    std::vector<Location>& locations = work->locations;
+    std::vector<RainResult>& results = work->results;
+
+    // Calc results
+    calc_results(locations, /*out*/results);
+
+    // Pretend a lot of work
+    std::this_thread::sleep_for(chrono::seconds(1));
+}
+
+static void WorkAsyncDone(uv_work_t* req, int status) {
+    HandleScope handleScope(Isolate::GetCurrent());
+    Isolate* isolate = handleScope.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+
+    Work* work = static_cast<Work *>(req->data);
+    std::vector<RainResult>& results = work->results;
+    Local<Function> callback = Local<Function>::New(isolate, work->callback);
+
+    // Pack results
+    Local<Array> Results = Array::New(isolate);
+    size_t len = results.size();
+    for (unsigned i = 0; i < len; ++i) {
+        Local<Object> Result = pack_rain_result(isolate, context, results[i]);
+        Results->Set(context, i, Result);
+    }
+
+    // Call callback
+    Local<Value> argv[] = { Null(isolate), Results };
+    const unsigned argc = sizeof(argv) / sizeof(argv[0]);
+    callback->Call(context, Null(isolate), argc, argv).ToLocalChecked();
+
+    // Cleanup
+    work->callback.Reset();
+    delete work;
+}
+
+void CalcResultsAsync(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    Local<Context> context = isolate->GetCurrentContext();
+
+    if (args.Length() < 2) {
+        isolate->ThrowException(
+            Exception::TypeError(
+                String::NewFromUtf8(
+                    isolate,
+                    "Wrong number of arguments",
+                    NewStringType::kNormal).ToLocalChecked()));
+        return;
+    }
+
+    // Unpack locations
+    std::vector<Location> locations;
+
+    Local<Array> Input = Local<Array>::Cast(args[0]);
+    size_t len = Input->Length();
+    for (size_t i = 0; i < len; ++i) {
+        Local<Object> Item = Input->Get(context, i).ToLocalChecked().As<Object>();
+        locations.push_back(unpack_location(isolate, context, Item));
+    }
+
+    // Callback
+    Local<Function> callback = Local<Function>::Cast(args[1]);
+
+    // Spawn worker thread
+    Work* work = new Work();
+    work->request.data = work;
+    work->locations = locations;
+    work->callback.Reset(isolate, callback);
+
+    uv_queue_work(uv_default_loop(), &work->request, WorkAsync, WorkAsyncDone);
+
+    std::cerr << "Returning from C++ now" << std::endl;
+    args.GetReturnValue().Set(Undefined(isolate));
+}
+
 void Init(Local<Object> exports, Local<Value> module, void* context) {
     NODE_SET_METHOD(exports, "avgRainfall", AvgRainfall);
     NODE_SET_METHOD(exports, "dataRainfall", RainfallData);
     NODE_SET_METHOD(exports, "calcResults", CalcResults);
+    NODE_SET_METHOD(exports, "calcResultsSync", CalcResultsSync);
+    NODE_SET_METHOD(exports, "calcResultsAsync", CalcResultsAsync);
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Init)

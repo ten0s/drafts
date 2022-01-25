@@ -21,6 +21,7 @@ console.log(`Mean = ${data.mean.toFixed(2)}`)
 console.log(`Median = ${data.median.toFixed(2)}`)
 console.log(`StDev = ${data.stdev.toFixed(2)}`)
 console.log(`N = ${data.n}`)
+console.log()
 
 // carried func
 const printResult = locations => (result, i) => {
@@ -32,11 +33,30 @@ const printResult = locations => (result, i) => {
     console.log(`\tMedian Rainfall: ${result.median.toFixed(2)}cm`)
     console.log(`\tStDev Rainfall: ${result.stdev.toFixed(2)}cm`)
     console.log(`\tNumber Samples: ${result.n}`)
-    console.log()
-    i++
 }
 
 const locations = [location]
 
+console.log('+ calcResults')
 const results = rainfall.calcResults(locations)
 results.forEach(printResult(locations))
+console.log('- calcResults')
+console.log()
+
+console.log('+ calcResultsSync')
+rainfall.calcResultsSync(locations, (results) => {
+    results.forEach(printResult(locations))
+})
+console.log('- calcResultsSync')
+console.log()
+
+console.log('+ calcResultsAsync')
+rainfall.calcResultsAsync(locations, (err, results) => {
+    if (err) {
+        console.error(err)
+        return;
+    }
+    results.forEach(printResult(locations))
+})
+console.log('- calcResultsAsync')
+console.log()
