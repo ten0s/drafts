@@ -49,6 +49,15 @@ Location unpack_location(Isolate* isolate, const Local<Context>& context, const 
     return loc;
 }
 
+void calc_results(std::vector<Location>& locations, std::vector<RainResult>& results) {
+    results.resize(locations.size());
+    std::transform(
+        locations.begin(),
+        locations.end(),
+        results.begin(),
+        calc_rain_stats);
+}
+
 Local<Object> pack_rain_result(Isolate* isolate, const Local<Context>& context, const RainResult& result) {
     Local<Object> Obj = Object::New(isolate);
 
@@ -88,7 +97,6 @@ void CalcResults(const FunctionCallbackInfo<Value>& args) {
     Local<Context> context = isolate->GetCurrentContext();
 
     std::vector<Location> locations;
-    std::vector<RainResult> results;
 
     Local<Array> Input = Local<Array>::Cast(args[0]);
     size_t len = Input->Length();
@@ -97,12 +105,8 @@ void CalcResults(const FunctionCallbackInfo<Value>& args) {
         locations.push_back(unpack_location(isolate, context, Item));
     }
 
-    results.resize(locations.size());
-    std::transform(
-        locations.begin(),
-        locations.end(),
-        results.begin(),
-        calc_rain_stats);
+    std::vector<RainResult> results;
+    calc_results(locations, /*out*/results);
 
     Local<Array> Results = Array::New(isolate);
     for (unsigned i = 0; i < len; ++i) {
