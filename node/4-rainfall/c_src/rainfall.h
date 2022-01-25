@@ -42,4 +42,4 @@ public:
 double avg_rainfall(Location & loc);
 RainResult calc_rain_stats(Location &loc);
 
-#endif
+#endif // __RAINFALL_H__

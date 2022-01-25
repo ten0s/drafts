@@ -32,10 +32,9 @@ RainResult calc_rain_stats(Location &loc) {
   	result.stdev = sqrt(ss/(result.n-1));
 
   	std::sort(loc.samples.begin(), loc.samples.end());
-	if (result.n %2 == 0) {
+	if (result.n % 2 == 0) {
 		result.median = (loc.samples[result.n / 2 - 1].rainfall + loc.samples[result.n / 2].rainfall) / 2;
-	}
-	else {
+	} else {
 		result.median = loc.samples[result.n / 2].rainfall;
 	}
 	return result;
