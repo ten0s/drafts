@@ -22,10 +22,8 @@ console.log(`Median = ${data.median.toFixed(2)}`)
 console.log(`StDev = ${data.stdev.toFixed(2)}`)
 console.log(`N = ${data.n}`)
 
-const locations = [location]
-const results = rainfall.calcResults(locations)
-let i = 0
-results.forEach((result) => {
+// carried func
+const printResult = locations => (result, i) => {
     console.log(`Result for Location ${i}`)
     console.log('--------------------------')
     console.log(`\tLatitude: ${locations[i].latitude.toFixed(2)}`)
@@ -36,4 +34,9 @@ results.forEach((result) => {
     console.log(`\tNumber Samples: ${result.n}`)
     console.log()
     i++
-})
+}
+
+const locations = [location]
+
+const results = rainfall.calcResults(locations)
+results.forEach(printResult(locations))
