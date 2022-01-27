@@ -7,8 +7,8 @@ class Polynomial {
 public:
     Polynomial(double a, double b, double c);
 
-    double at(double x);
-    std::vector<double> roots();
+    double at(double x) const;
+    std::vector<double> roots() const;
 
     double getA() const { return a_; }
     double getB() const { return b_; }
