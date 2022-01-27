@@ -200,7 +200,7 @@ void CalcResultsSync(const FunctionCallbackInfo<Value>& args) {
 
     // Call callback
     Local<Value> argv[] = { output };
-    const unsigned argc = sizeof(argv) / sizeof(argv[0]);
+    const size_t argc = sizeof(argv) / sizeof(argv[0]);
     callback->Call(context, Null(isolate), argc, argv).ToLocalChecked();
 
     // Return `undefined`
@@ -242,7 +242,7 @@ static void WorkAsyncDone(uv_work_t* req, int status) {
 
     // Call callback
     Local<Value> argv[] = { Null(isolate), output };
-    const unsigned argc = sizeof(argv) / sizeof(argv[0]);
+    const size_t argc = sizeof(argv) / sizeof(argv[0]);
     callback->Call(context, Null(isolate), argc, argv).ToLocalChecked();
 
     // Cleanup
