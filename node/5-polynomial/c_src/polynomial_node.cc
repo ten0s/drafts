@@ -1,7 +1,7 @@
 #include <node.h>
 #include <node_object_wrap.h>
 
-#include <cmath>
+#include "polynomial.h"
 
 using v8::Array;
 using v8::Context;
@@ -33,8 +33,13 @@ public:
     static void Add(const FunctionCallbackInfo<Value>& info);
 
 private:
-    explicit WrappedPoly(double a = 0, double b = 0, double c = 0) : a_(a), b_(b), c_(c) {}
-    ~WrappedPoly() {}
+    explicit WrappedPoly(double a = 0, double b = 0, double c = 0) {
+        poly_ = new Polynomial(a, b, c);
+    }
+
+    ~WrappedPoly() {
+        delete poly_;
+    }
 
     static void New(const FunctionCallbackInfo<Value>& info);
 
@@ -45,9 +50,8 @@ private:
     static void Roots(const FunctionCallbackInfo<Value>& info);
 
     static Persistent<Function> constructor;
-    double a_;
-    double b_;
-    double c_;
+
+    Polynomial* poly_;
 };
 
 Persistent<Function> WrappedPoly::constructor;
@@ -108,17 +112,17 @@ void WrappedPoly::New(const FunctionCallbackInfo<Value>& info) {
 void WrappedPoly::GetProp(Local<String> prop,
                        const PropertyCallbackInfo<Value>& info) {
     Isolate* isolate = info.GetIsolate();
-    WrappedPoly* poly = ObjectWrap::Unwrap<WrappedPoly>(info.This());
+    WrappedPoly* obj = ObjectWrap::Unwrap<WrappedPoly>(info.This());
 
     String::Utf8Value s(isolate, prop);
     std::string str(*s);
 
     if (str == "a") {
-        info.GetReturnValue().Set(poly->a_);
+        info.GetReturnValue().Set(obj->poly_->getA());
     } else if (str == "b") {
-        info.GetReturnValue().Set(poly->b_);
+        info.GetReturnValue().Set(obj->poly_->getB());
     } else if (str == "c") {
-        info.GetReturnValue().Set(poly->c_);
+        info.GetReturnValue().Set(obj->poly_->getC());
     }
 }
 
@@ -126,25 +130,25 @@ void WrappedPoly::SetProp(Local<String> prop,
                        Local<Value> value,
                        const PropertyCallbackInfo<void>& info) {
     Isolate* isolate = info.GetIsolate();
-    WrappedPoly* poly = ObjectWrap::Unwrap<WrappedPoly>(info.This());
+    WrappedPoly* obj = ObjectWrap::Unwrap<WrappedPoly>(info.This());
 
     String::Utf8Value s(isolate, prop);
     std::string str(*s);
 
     if (str == "a") {
-        poly->a_ = value.As<Number>()->Value();
+        obj->poly_->setA(value.As<Number>()->Value());
     } else if (str == "b") {
-        poly->b_ = value.As<Number>()->Value();
+        obj->poly_->setB(value.As<Number>()->Value());
     } else if (str == "c") {
-        poly->c_ = value.As<Number>()->Value();
+        obj->poly_->setC(value.As<Number>()->Value());
     }
 }
 
 void WrappedPoly::At(const FunctionCallbackInfo<Value>& info) {
-    double x = info[0]->IsUndefined() ? 0 : info[0].As<Number>()->Value();
-    WrappedPoly* poly = ObjectWrap::Unwrap<WrappedPoly>(info.Holder());
+    WrappedPoly* obj = ObjectWrap::Unwrap<WrappedPoly>(info.Holder());
 
-    double results = x * x * poly->a_ + x * poly->b_ + poly->c_;
+    double x = info[0]->IsUndefined() ? 0 : info[0].As<Number>()->Value();
+    double results = obj->poly_->at(x);
 
     info.GetReturnValue().Set(results);
 }
@@ -153,21 +157,16 @@ void WrappedPoly::Roots(const FunctionCallbackInfo<Value>& info) {
     Isolate* isolate = info.GetIsolate();
     Local<Context> context = isolate->GetCurrentContext();
 
-    WrappedPoly* poly = ObjectWrap::Unwrap<WrappedPoly>(info.Holder());
+    WrappedPoly* obj = ObjectWrap::Unwrap<WrappedPoly>(info.Holder());
+    Local<Array> results = Array::New(isolate);
 
-    Local<Array> roots = Array::New(isolate);
-
-    double desc = poly->b_ * poly->b_ - (4 * poly->a_ * poly->c_);
-    if (desc >= 0) {
-        double r = (-poly->b_ + sqrt(desc)) / (2 * poly->a_);
-        roots->Set(context, 0, NEW_NUM(r)).IsJust();
-        if ( desc > 0) {
-            r = (-poly->b_ - sqrt(desc)) / (2 * poly->a_);
-            roots->Set(context, 1, NEW_NUM(r)).IsJust();
-        }
+    std::vector<double> roots = obj->poly_->roots();
+    const size_t len = roots.size();
+    for (size_t i = 0; i < len; ++i) {
+        results->Set(context, i, NEW_NUM(roots[i])).IsJust();
     }
 
-    info.GetReturnValue().Set(roots);
+    info.GetReturnValue().Set(results);
 }
 
 void WrappedPoly::Add(const FunctionCallbackInfo<Value>& info) {
@@ -177,9 +176,9 @@ void WrappedPoly::Add(const FunctionCallbackInfo<Value>& info) {
     WrappedPoly* obj1 = ObjectWrap::Unwrap<WrappedPoly>(info[0].As<Object>());
     WrappedPoly* obj2 = ObjectWrap::Unwrap<WrappedPoly>(info[1].As<Object>());
 
-    double a = obj1->a_ + obj2->a_;
-    double b = obj1->b_ + obj2->b_;
-    double c = obj1->c_ + obj2->c_;
+    double a = obj1->poly_->getA() + obj2->poly_->getA();
+    double b = obj1->poly_->getB() + obj2->poly_->getB();
+    double c = obj1->poly_->getC() + obj2->poly_->getC();
 
     Local<Value> argv[] = { NEW_NUM(a), NEW_NUM(b), NEW_NUM(c) };
     const size_t argc = sizeof(argv) / sizeof(argv[0]);
