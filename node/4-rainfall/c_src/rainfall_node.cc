@@ -102,8 +102,8 @@ Local<Array> pack_results(Isolate* isolate,
                           const std::vector<RainResult>& results) {
     Local<Array> arr = Array::New(isolate);
 
-    size_t len = results.size();
-    for (unsigned i = 0; i < len; ++i) {
+    const size_t len = results.size();
+    for (size_t i = 0; i < len; ++i) {
         Local<Object> obj = pack_rain_result(isolate, context, results[i]);
         arr->Set(context, i, obj).IsJust();
     }
