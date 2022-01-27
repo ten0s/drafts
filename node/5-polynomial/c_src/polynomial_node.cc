@@ -79,7 +79,7 @@ void WrappedPoly::Init(Local<Object> exports) {
     constructor.Reset(isolate, cons);
 
     // Export the constructor
-    exports->Set(context, NEW_STR("Polynomial"), cons);
+    exports->Set(context, NEW_STR("Polynomial"), cons).IsJust();
 }
 
 void WrappedPoly::New(const FunctionCallbackInfo<Value>& info) {
@@ -160,10 +160,10 @@ void WrappedPoly::Roots(const FunctionCallbackInfo<Value>& info) {
     double desc = poly->b_ * poly->b_ - (4 * poly->a_ * poly->c_);
     if (desc >= 0) {
         double r = (-poly->b_ + sqrt(desc)) / (2 * poly->a_);
-        roots->Set(context, 0, NEW_NUM(r));
+        roots->Set(context, 0, NEW_NUM(r)).IsJust();
         if ( desc > 0) {
             r = (-poly->b_ - sqrt(desc)) / (2 * poly->a_);
-            roots->Set(context, 1, NEW_NUM(r));
+            roots->Set(context, 1, NEW_NUM(r)).IsJust();
         }
     }
 

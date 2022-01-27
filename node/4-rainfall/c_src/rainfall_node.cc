@@ -25,6 +25,7 @@ using v8::String;
 using v8::Value;
 
 #define NEW_STR(str) String::NewFromUtf8(isolate, str, NewStringType::kNormal).ToLocalChecked()
+#define NEW_NUM(num) Number::New(isolate, num)
 
 Sample unpack_sample(Isolate* isolate,
                      const Local<Context>& context,
@@ -88,10 +89,10 @@ Local<Object> pack_rain_result(Isolate* isolate,
                                const RainResult& result) {
     Local<Object> obj = Object::New(isolate);
 
-    obj->Set(context, NEW_STR("mean"), Number::New(isolate, result.mean));
-    obj->Set(context, NEW_STR("median"), Number::New(isolate, result.median));
-    obj->Set(context, NEW_STR("stdev"), Number::New(isolate, result.stdev));
-    obj->Set(context, NEW_STR("n"), Integer::New(isolate, result.n));
+    obj->Set(context, NEW_STR("mean"), NEW_NUM(result.mean)).IsJust();
+    obj->Set(context, NEW_STR("median"), NEW_NUM(result.median)).IsJust();
+    obj->Set(context, NEW_STR("stdev"), NEW_NUM(result.stdev)).IsJust();
+    obj->Set(context, NEW_STR("n"), NEW_NUM(result.n)).IsJust();
 
     return obj;
 }
@@ -104,7 +105,7 @@ Local<Array> pack_results(Isolate* isolate,
     size_t len = results.size();
     for (unsigned i = 0; i < len; ++i) {
         Local<Object> obj = pack_rain_result(isolate, context, results[i]);
-        arr->Set(context, i, obj);
+        arr->Set(context, i, obj).IsJust();
     }
 
     return arr;
