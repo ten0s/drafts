@@ -1,0 +1,19 @@
+{
+    "name": "hello-nan",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "npx node-gyp configure build",
+        "rebuild": "npx node-gyp clean configure build",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "node-gyp": "^8.4.1"
+    },
+    "dependencies": {
+        "nan": "^2.15.0"
+    }
+}
