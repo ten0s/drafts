@@ -11,6 +11,9 @@ compile: hello-gtk.exe hello-gtk-cairo.exe
 run: compile
 	./hello-gtk && ./hello-gtk-cairo
 
+dlls: compile
+	ldd hello-gtk.exe hello-gtk-cairo.exe | grep mingw | sed -E  's#[^/]*(/.*\.dll).*#\1#' | sort -u
+
 hello-gtk.exe:
 	gcc -o hello-gtk hello-gtk.c `pkg-config --libs --cflags gtk+-3.0`
 
