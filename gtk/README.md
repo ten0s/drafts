@@ -16,6 +16,7 @@ libcairo2-dev: /usr/include/cairo/cairo.h
 ## MinGW64
 
 ```
+$ pacman -S make
 $ make -f Makefile.mingw64 init
 $ make -f Makefile.mingw64 compile
 $ make -f Makefile.mingw64 run
