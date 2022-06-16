@@ -1,0 +1,17 @@
+# -*- mode: makefile -*-
+
+all: compile
+
+init:
+	sudo apt -y install TODO
+
+compile: hello-gtk.c
+
+run: compile
+	./hello-gtk
+
+hello-gtk.c:
+	gcc -o hello-gtk `pkg-config --libs --cflags gtk+-3.0`
+
+clean:
+	rm -f hello-gtk
