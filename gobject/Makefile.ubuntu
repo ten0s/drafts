@@ -5,13 +5,13 @@ all: compile
 init:
 	sudo apt -y install TODO
 
-compile: hello-gtk.c
+compile: gvalue
 
 run: compile
-	./hello-gtk
+	./gvalue
 
-hello-gtk.c:
-	gcc -o hello-gtk `pkg-config --libs --cflags gtk+-3.0`
+gvalue: gvalue.c
+	gcc -o gvalue gvalue.c `pkg-config --libs --cflags gobject-2.0`
 
 clean:
-	rm -f hello-gtk
+	rm -f gvalue

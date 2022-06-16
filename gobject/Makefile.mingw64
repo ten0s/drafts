@@ -6,7 +6,7 @@ init:
 	pacman --noconfirm -S --needed base-devel mingw-w64-x86_64-toolchain
 	pacman --noconfirm -S mingw-w64-x86_64-gobject-introspection
 
-compile: gvalue.c
+compile: gvalue
 
 run: compile
 	./gvalue
@@ -14,7 +14,7 @@ run: compile
 dlls: compile
 	ldd gvalue.exe | grep mingw | sed -E  's#[^/]*(/.*\.dll).*#\1#' | sort -u
 
-gvalue.c:
+gvalue: gvalue.c
 	gcc -o gvalue gvalue.c `pkg-config --libs --cflags gobject-2.0`
 
 clean:
