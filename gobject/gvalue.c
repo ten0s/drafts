@@ -19,5 +19,10 @@ int main (int argc, char *argv[])
   // Release all resources associated with this GValue
   g_value_unset (&a);
 
+  g_value_init (&a, G_TYPE_INT);
+  g_value_set_int (&a, 42);
+  g_printf ("%d\n", g_value_get_int (&a));
+  g_value_unset (&a);
+
   return 0;
 }
