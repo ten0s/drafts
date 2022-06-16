@@ -3,6 +3,9 @@
 
 int main (int argc, char *argv[])
 {
+  g_printf("G_TYPE_STRING: %ld\n"
+           "G_TYPE_INT   : %ld\n", G_TYPE_STRING, G_TYPE_INT);
+
   // GValues must be initialized
   GValue a = G_VALUE_INIT;
 
