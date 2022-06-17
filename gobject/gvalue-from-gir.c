@@ -15,7 +15,6 @@ int main(void)
         return 1;
     }
 
-/*
     g_irepository_require(repo, "GLib", "2.0", 0, &error);
     if (error) {
         g_error ("ERROR: %s\n", error->message);
@@ -25,12 +24,11 @@ int main(void)
     gchar** deps = g_irepository_get_dependencies(repo, "GObject");
     gchar** iter = deps;
     while (*iter) {
-        g_printf("dep: %s\n", *iter);
+        g_printf("GObject dependency: %s\n", *iter);
         g_free(*iter);
         iter++;
     }
     g_free(deps);
-*/
 
     GIBaseInfo *biValue = g_irepository_find_by_name(repo, "GObject", "Value");
     if (!biValue) {
