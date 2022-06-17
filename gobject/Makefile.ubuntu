@@ -3,7 +3,7 @@
 all: compile
 
 init:
-	sudo apt -y install TODO
+	sudo apt -y install gobject-introspection
 
 compile: gvalue gvalue-from-gir
 
