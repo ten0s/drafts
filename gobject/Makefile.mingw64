@@ -6,11 +6,11 @@ init:
 	pacman --noconfirm -S --needed base-devel mingw-w64-x86_64-toolchain
 	pacman --noconfirm -S mingw-w64-x86_64-gobject-introspection
 
-compile: gvalue
+compile: gvalue gvalue-from-gir
 
 run: compile
 	./gvalue.exe
-    ./gvalue-from-gir.exe
+	./gvalue-from-gir.exe
 
 dlls: compile
 	ldd gvalue.exe | grep mingw | sed -E  's#[^/]*(/.*\.dll).*#\1#' | sort -u
