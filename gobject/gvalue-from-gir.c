@@ -4,47 +4,69 @@
 
 #define LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
 
-void print_deps(GIRepository *repo, const char *name) {
-    g_printf("%s deps:\n", name);
-    gchar** deps = g_irepository_get_dependencies(repo, name);
+// parse_ns_ver("GLib-2.0", &ns, &ver)
+void parse_ns_ver(const char *name, char **ns, char **ver) {
+    size_t nsLen = strcspn (name, "-");
+    *ns = malloc(nsLen + 1);
+    memset(*ns, 0, nsLen + 1);
+    strncpy(*ns, name, nsLen);
+
+    size_t verLen = strlen(name) - nsLen - 1/*-*/;
+    *ver = malloc(verLen + 1);
+    memset(*ver, 0, verLen + 1);
+    strncpy(*ver, name + nsLen + 1/*-*/, verLen);
+}
+
+gboolean require(GIRepository *repo, const char *ns, const char *ver) {
+    GError *error = NULL;
+
+    g_irepository_require(repo, ns, ver, 0, &error);
+    if (error) {
+        g_error ("Require: %s-%s failed with: %s\n", ns, ver, error->message);
+        return FALSE;
+    }
+
+    gchar** deps = g_irepository_get_dependencies(repo, ns);
     gchar** iter = deps;
     int i = 1;
     while (*iter) {
-        g_printf("%d - %s\n", i, *iter);
+        const char *dep = *iter;
+
+        char *depNs = NULL;
+        char *depVer = NULL;
+        parse_ns_ver(dep, &depNs, &depVer);
+        g_printf("%d - %s-%s\n", i, depNs, depVer);
+        free(depNs);
+        free(depVer);
+
         g_free(*iter);
         iter++;
         i++;
     }
     g_free(deps);
+    g_printf("%s-%s Loaded\n", ns, ver);
+
+    return TRUE;
 }
 
 int main(void)
 {
-    GError *error = NULL;
-
     GIRepository *repo = g_irepository_get_default();
-    g_irepository_require(repo, "GLib", "2.0", 0, &error);
-    if (error) {
-        g_error ("ERROR: %s\n", error->message);
+
+    if (!require(repo, "GLib", "2.0")) {
         return 1;
     }
 
-    g_irepository_require(repo, "GObject", "2.0", 0, &error);
-    if (error) {
-        g_error("ERROR: %s\n", error->message);
+    if (!require(repo, "GObject", "2.0")) {
         return 1;
     }
 
-    g_irepository_require(repo, "Gdk", "3.0", 0, &error);
-    if (error) {
-        g_error ("ERROR: %s\n", error->message);
+    if (!require(repo, "Gdk", "3.0")) {
         return 1;
     }
 
-    print_deps(repo, "GLib");
-    print_deps(repo, "GObject");
-    print_deps(repo, "Gdk");
-
+    // GObject Value
+    // https://docs.gtk.org/gobject/struct.Value.html
     GIBaseInfo *biValue = g_irepository_find_by_name(repo, "GObject", "Value");
     if (!biValue) {
         g_error("ERROR: %s\n", "Could not find GObject.Value");
@@ -76,6 +98,17 @@ int main(void)
         g_error("ERROR: %s\n", "Could not find GObject.Value.unset");
         return 1;
     }
+
+    // GObject g_type_from_name
+    // https://docs.gtk.org/gobject/func.type_from_name.html
+    GIBaseInfo *biTypeFromName = g_irepository_find_by_name(repo, "GObject", "type_from_name");
+    if (!biTypeFromName) {
+        g_error("ERROR: %s\n", "Could not find GObject.type_from_name");
+        return 1;
+    }
+    GIFunctionInfo *fiTypeFromName = (GIFunctionInfo *)biTypeFromName;
+
+    GError *error = NULL;
 
     GIArgument retval;
     GValue val = G_VALUE_INIT;
@@ -149,6 +182,21 @@ int main(void)
     g_base_info_unref(biValue);
 
     g_printf("GObject.Value unset\n");
+
+    GIArgument argsTypeFromName[] = {
+        { .v_pointer = (gpointer)"GBoxed" },
+    };
+    if (!g_function_info_invoke(
+            fiTypeFromName,
+            (const GIArgument *)argsTypeFromName, LENGTH(argsTypeFromName),
+            NULL, 0,
+            &retval,
+            &error)) {
+        g_error ("ERROR: %s\n", error->message);
+        return 1;
+    }
+
+    g_printf("GObject.type_from_name: %ld\n", retval.v_ulong);
 
     return 0;
 }
