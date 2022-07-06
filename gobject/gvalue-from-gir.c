@@ -17,7 +17,12 @@ void parse_ns_ver(const char *name, char **ns, char **ver) {
     strncpy(*ver, name + nsLen + 1/*-*/, verLen);
 }
 
-gboolean require(GIRepository *repo, const char *ns, const char *ver) {
+void print_indent(int level) {
+   g_printf("%*s", 4*level, "");
+}
+
+gboolean require(GIRepository *repo, const char *ns, const char *ver, int level) {
+    print_indent(level);
     g_printf("%s-%s Loading...\n", ns, ver);
 
     GError *error = NULL;
@@ -38,7 +43,7 @@ gboolean require(GIRepository *repo, const char *ns, const char *ver) {
         parse_ns_ver(dep, &depNs, &depVer);
         //g_printf("%s-%s\n", depNs, depVer);
 
-        failed = !require(repo, depNs, depVer);
+        failed = !require(repo, depNs, depVer, level+1);
 
         free(depNs);
         free(depVer);
@@ -46,6 +51,7 @@ gboolean require(GIRepository *repo, const char *ns, const char *ver) {
         iter++;
     }
 
+    print_indent(level);
     if (!failed) {
         g_printf("%s-%s Loaded\n", ns, ver);
     } else {
@@ -67,11 +73,11 @@ int main(void)
 {
     GIRepository *repo = g_irepository_get_default();
 
-    if (!require(repo, "GObject", "2.0")) {
+    if (!require(repo, "GObject", "2.0", 0)) {
         return 1;
     }
 
-    if (!require(repo, "Gdk", "3.0")) {
+    if (!require(repo, "Gdk", "3.0", 0)) {
         return 1;
     }
 
