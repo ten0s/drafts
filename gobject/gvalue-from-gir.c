@@ -142,11 +142,11 @@ int main(void)
 
     g_printf("GObject.Value.init: %ld\n", G_TYPE_STRING);
 
-    const gchar *str = "Hello";
+    const gchar *hello = "Hello";
 
     GIArgument argsSetString[2] = {
-        { .v_pointer = (gpointer)&val },
-        { .v_pointer = (gpointer)str  },
+        { .v_pointer = (gpointer)&val  },
+        { .v_pointer = (gpointer)hello },
     };
     if (!g_function_info_invoke(
             fiSetString,
@@ -158,7 +158,7 @@ int main(void)
         return 1;
     }
 
-    g_printf("GObject.Value.setString: %s\n", str);
+    g_printf("GObject.Value.setString: %s\n", hello);
 
     GIArgument argsGetString[1] = {
         { .v_pointer = (gpointer)&val },
@@ -196,8 +196,11 @@ int main(void)
 
     g_printf("GObject.Value unset\n");
 
+
+    const char *name = "GdkRGBA";
+
     GIArgument argsTypeFromName[] = {
-        { .v_pointer = (gpointer)"GBoxed" },
+        { .v_pointer = (gpointer)name },
     };
     if (!g_function_info_invoke(
             fiTypeFromName,
@@ -211,7 +214,7 @@ int main(void)
 
     g_base_info_unref(biTypeFromName);
 
-    g_printf("GObject.type_from_name: %ld\n", retval.v_ulong);
+    g_printf("GObject.type_from_name(\"%s\"): %ld\n", name, retval.v_ulong);
 
     return 0;
 }
