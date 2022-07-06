@@ -74,7 +74,9 @@ int gobject_value(GIRepository *repo) {
     //
     // GObject Value
     // https://docs.gtk.org/gobject/struct.Value.html
+    //
     // /usr/share/gir-1.0/GObject-2.0.gir
+    // Search for  <record name="Value"
     //
 
     GIBaseInfo *biValue = g_irepository_find_by_name(repo, "GObject", "Value");
@@ -196,7 +198,9 @@ int gdk_rgba(GIRepository *repo) {
     //
     // GDK RGBA
     // https://docs.gtk.org/gdk3/struct.RGBA.html
+    //
     // /usr/share/gir-1.0/Gdk-3.0.gir
+    // Search for <record name="RGBA"
     //
 
     GIBaseInfo *biRgba = g_irepository_find_by_name(repo, "Gdk", "RGBA");
