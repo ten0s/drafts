@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
     g_printf("GdkRGBA type1: %ld\n", type1);
 
     // Returns 0 without the call above :(
+    // Works if loaded from GIR. See gvalue-from-gir.c
     GType type2 = g_type_from_name("GdkRGBA");
     g_printf("GdkRGBA type2: %ld\n", type2);
 

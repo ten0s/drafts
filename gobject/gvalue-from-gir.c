@@ -85,26 +85,26 @@ int gobject_value(GIRepository *repo) {
 
     //print_info(biValue);
 
-    GIFunctionInfo *fiInit = g_struct_info_find_method(biValue, "init");
-    if (!fiInit) {
+    GIFunctionInfo *fiValueInit = g_struct_info_find_method(biValue, "init");
+    if (!fiValueInit) {
         g_error("ERROR: %s\n", "Could not find GObject.Value.init");
         return 1;
     }
 
-    GIFunctionInfo *fiSetString = g_struct_info_find_method(biValue, "set_string");
-    if (!fiSetString) {
+    GIFunctionInfo *fiValueSetString = g_struct_info_find_method(biValue, "set_string");
+    if (!fiValueSetString) {
         g_error("ERROR: %s\n", "Could not find GObject.Value.set_string");
         return 1;
     }
 
-    GIFunctionInfo *fiGetString = g_struct_info_find_method(biValue, "get_string");
-    if (!fiGetString) {
+    GIFunctionInfo *fiValueGetString = g_struct_info_find_method(biValue, "get_string");
+    if (!fiValueGetString) {
         g_error("ERROR: %s\n", "Could not find GObject.Value.get_string");
         return 1;
     }
 
-    GIFunctionInfo *fiUnset = g_struct_info_find_method(biValue, "unset");
-    if (!fiUnset) {
+    GIFunctionInfo *fiValueUnset = g_struct_info_find_method(biValue, "unset");
+    if (!fiValueUnset) {
         g_error("ERROR: %s\n", "Could not find GObject.Value.unset");
         return 1;
     }
@@ -119,7 +119,7 @@ int gobject_value(GIRepository *repo) {
         { .v_ulong   = G_TYPE_STRING  },
     };
     if (!g_function_info_invoke(
-            fiInit,
+            fiValueInit,
             (const GIArgument *)argsInit, LENGTH(argsInit),
             NULL, 0,
             &retval,
@@ -137,7 +137,7 @@ int gobject_value(GIRepository *repo) {
         { .v_pointer = (gpointer)hello },
     };
     if (!g_function_info_invoke(
-            fiSetString,
+            fiValueSetString,
             (const GIArgument *)argsSetString, LENGTH(argsSetString),
             NULL, 0,
             &retval,
@@ -152,7 +152,7 @@ int gobject_value(GIRepository *repo) {
         { .v_pointer = (gpointer)&val },
     };
     if (!g_function_info_invoke(
-            fiGetString,
+            fiValueGetString,
             (const GIArgument *)argsGetString, LENGTH(argsGetString),
             NULL, 0,
             &retval,
@@ -167,7 +167,7 @@ int gobject_value(GIRepository *repo) {
         { .v_pointer = (gpointer)&val },
     };
     if (!g_function_info_invoke(
-            fiUnset,
+            fiValueUnset,
             (const GIArgument *)argsUnset, LENGTH(argsUnset),
             NULL, 0,
             &retval,
@@ -176,10 +176,10 @@ int gobject_value(GIRepository *repo) {
         return 1;
     }
 
-    g_base_info_unref(fiUnset);
-    g_base_info_unref(fiGetString);
-    g_base_info_unref(fiSetString);
-    g_base_info_unref(fiInit);
+    g_base_info_unref(fiValueUnset);
+    g_base_info_unref(fiValueGetString);
+    g_base_info_unref(fiValueSetString);
+    g_base_info_unref(fiValueInit);
     g_base_info_unref(biValue);
 
     g_printf("GObject.Value unset\n");
