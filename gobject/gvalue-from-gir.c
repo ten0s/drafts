@@ -23,7 +23,7 @@ void print_indent(int level) {
 
 gboolean require(GIRepository *repo, const char *ns, const char *ver, int level) {
     print_indent(level);
-    g_printf("%s-%s Loading...\n", ns, ver);
+    g_printf("%s-%s Loading\n", ns, ver);
 
     GError *error = NULL;
     g_irepository_require(repo, ns, ver, 0, &error);
@@ -52,7 +52,7 @@ gboolean require(GIRepository *repo, const char *ns, const char *ver, int level)
     }
 
     print_indent(level);
-    g_printf("%s-%s %sLoaded\n", ns, ver, failed ? "Failed" : "Loaded");
+    g_printf("%s-%s %s\n", ns, ver, failed ? "Failed" : "Done");
 
 free:
     iter = deps;
