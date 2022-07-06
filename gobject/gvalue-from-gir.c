@@ -6,7 +6,7 @@
 
 // parse_ns_ver("GLib-2.0", &ns, &ver)
 void parse_ns_ver(const char *name, char **ns, char **ver) {
-    size_t nsLen = strcspn (name, "-");
+    size_t nsLen = strcspn(name, "-");
     *ns = malloc(nsLen + 1);
     memset(*ns, 0, nsLen + 1);
     strncpy(*ns, name, nsLen);
