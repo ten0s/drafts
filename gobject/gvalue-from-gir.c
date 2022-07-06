@@ -52,11 +52,7 @@ gboolean require(GIRepository *repo, const char *ns, const char *ver, int level)
     }
 
     print_indent(level);
-    if (!failed) {
-        g_printf("%s-%s Loaded\n", ns, ver);
-    } else {
-        g_printf("%s-%s Failed\n", ns, ver);
-    }
+    g_printf("%s-%s %sLoaded\n", ns, ver, failed ? "Failed" : "Loaded");
 
 free:
     iter = deps;
