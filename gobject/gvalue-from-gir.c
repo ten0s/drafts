@@ -65,20 +65,18 @@ free:
     return !failed;
 }
 
-int main(void)
-{
-    GIRepository *repo = g_irepository_get_default();
+int gobject_value(GIRepository *repo) {
 
     if (!require(repo, "GObject", "2.0", 0)) {
         return 1;
     }
 
-    if (!require(repo, "Gdk", "3.0", 0)) {
-        return 1;
-    }
-
+    //
     // GObject Value
     // https://docs.gtk.org/gobject/struct.Value.html
+    // /usr/share/gir-1.0/GObject-2.0.gir
+    //
+
     GIBaseInfo *biValue = g_irepository_find_by_name(repo, "GObject", "Value");
     if (!biValue) {
         g_error("ERROR: %s\n", "Could not find GObject.Value");
@@ -111,19 +109,9 @@ int main(void)
         return 1;
     }
 
-    // GObject g_type_from_name
-    // https://docs.gtk.org/gobject/func.type_from_name.html
-    GIBaseInfo *biTypeFromName = g_irepository_find_by_name(repo, "GObject", "type_from_name");
-    if (!biTypeFromName) {
-        g_error("ERROR: %s\n", "Could not find GObject.type_from_name");
-        return 1;
-    }
-    GIFunctionInfo *fiTypeFromName = (GIFunctionInfo *)biTypeFromName;
-
-
     GError *error = NULL;
-
     GIArgument retval;
+
     GValue val = G_VALUE_INIT;
 
     GIArgument argsInit[2] = {
@@ -196,8 +184,43 @@ int main(void)
 
     g_printf("GObject.Value unset\n");
 
+    return 0;
+}
+
+int gdk_rgba(GIRepository *repo) {
+
+    if (!require(repo, "Gdk", "3.0", 0)) {
+        return 1;
+    }
+
+    //
+    // GDK RGBA
+    // https://docs.gtk.org/gdk3/struct.RGBA.html
+    // /usr/share/gir-1.0/Gdk-3.0.gir
+    //
+
+    GIBaseInfo *biRgba = g_irepository_find_by_name(repo, "Gdk", "RGBA");
+    if (!biRgba) {
+        g_error("ERROR: %s\n", "Could not find Gdk.Rgba");
+        return 1;
+    }
+
+    print_info(biRgba);
+
+    // GObject g_type_from_name
+    // https://docs.gtk.org/gobject/func.type_from_name.html
+    GIBaseInfo *biTypeFromName = g_irepository_find_by_name(repo, "GObject", "type_from_name");
+    if (!biTypeFromName) {
+        g_error("ERROR: %s\n", "Could not find GObject.type_from_name");
+        return 1;
+    }
+    GIFunctionInfo *fiTypeFromName = (GIFunctionInfo *)biTypeFromName;
+
 
     const char *name = "GdkRGBA";
+
+    GError *error = NULL;
+    GIArgument retval;
 
     GIArgument argsTypeFromName[] = {
         { .v_pointer = (gpointer)name },
@@ -212,6 +235,7 @@ int main(void)
         return 1;
     }
 
+    g_base_info_unref(biRgba);
     g_base_info_unref(biTypeFromName);
 
     g_printf("GObject.type_from_name(\"%s\"): %ld\n", name, retval.v_ulong);
@@ -230,6 +254,14 @@ int main(void)
     const color1 = val.getBoxed()
     expect(color1.toString(), 'rgba(128,128,128,0.5)')
  */
+}
+
+int main(void)
+{
+    GIRepository *repo = g_irepository_get_default();
+
+    gobject_value(repo);
+    gdk_rgba(repo);
 
     return 0;
 }
