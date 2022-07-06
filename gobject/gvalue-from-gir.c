@@ -216,5 +216,20 @@ int main(void)
 
     g_printf("GObject.type_from_name(\"%s\"): %ld\n", name, retval.v_ulong);
 
+
+    /*
+    const color0 = new Gdk.RGBA({ red: 0.5, blue: 0.5, green: 0.5, alpha: 0.5 })
+    console.log(color0)
+    const val = new GObject.Value()
+    console.log(val)
+    const type = GObject.typeFromName('GdkRGBA')
+    console.log(type)
+    val.init(GObject.TYPE_STRING)
+    val.setBoxed(color0)
+    expect(color0.toString(), 'rgba(128,128,128,0.5)')
+    const color1 = val.getBoxed()
+    expect(color1.toString(), 'rgba(128,128,128,0.5)')
+ */
+
     return 0;
 }

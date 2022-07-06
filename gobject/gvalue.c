@@ -30,10 +30,10 @@ int main(int argc, char *argv[])
     g_printf("%d\n", g_value_get_int(&a));
     g_value_unset(&a);
 
-    // Init GDK
-    gint gdk_argc = 0;
-    gchar **gdk_argv = NULL;
-    gdk_init(&gdk_argc, &gdk_argv);
+    // Init GDK?
+    //gint gdk_argc = 0;
+    //gchar **gdk_argv = NULL;
+    //gdk_init(&gdk_argc, &gdk_argv);
 
     GdkRGBA rgba = { .red = 0.5, .blue = 0.5, .green = 0.5, .alpha = 0.5 };
 
