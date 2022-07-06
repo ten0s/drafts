@@ -18,7 +18,7 @@ void parse_ns_ver(const char *name, char **ns, char **ver) {
 }
 
 gboolean require(GIRepository *repo, const char *ns, const char *ver) {
-    g_printf("%s-%s Loading...\n");
+    g_printf("%s-%s Loading...\n", ns, ver);
 
     GError *error = NULL;
     g_irepository_require(repo, ns, ver, 0, &error);
@@ -29,20 +29,20 @@ gboolean require(GIRepository *repo, const char *ns, const char *ver) {
 
     gchar** deps = g_irepository_get_dependencies(repo, ns);
     gchar** iter = deps;
-    int i = 1;
     while (*iter) {
         const char *dep = *iter;
 
         char *depNs = NULL;
         char *depVer = NULL;
         parse_ns_ver(dep, &depNs, &depVer);
-        g_printf("%d - %s-%s\n", i, depNs, depVer);
+        //g_printf("%s-%s\n", depNs, depVer);
+        require(repo, depNs, depVer);
+
         free(depNs);
         free(depVer);
 
         g_free(*iter);
         iter++;
-        i++;
     }
     g_free(deps);
     g_printf("%s-%s Loaded\n", ns, ver);
@@ -53,10 +53,6 @@ gboolean require(GIRepository *repo, const char *ns, const char *ver) {
 int main(void)
 {
     GIRepository *repo = g_irepository_get_default();
-
-    if (!require(repo, "GLib", "2.0")) {
-        return 1;
-    }
 
     if (!require(repo, "GObject", "2.0")) {
         return 1;
@@ -197,6 +193,8 @@ int main(void)
         g_error ("ERROR: %s\n", error->message);
         return 1;
     }
+
+    g_base_info_unref(biTypeFromName);
 
     g_printf("GObject.type_from_name: %ld\n", retval.v_ulong);
 
