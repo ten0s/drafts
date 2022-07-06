@@ -18,8 +18,9 @@ void parse_ns_ver(const char *name, char **ns, char **ver) {
 }
 
 gboolean require(GIRepository *repo, const char *ns, const char *ver) {
-    GError *error = NULL;
+    g_printf("%s-%s Loading...\n");
 
+    GError *error = NULL;
     g_irepository_require(repo, ns, ver, 0, &error);
     if (error) {
         g_error ("Require: %s-%s failed with: %s\n", ns, ver, error->message);
@@ -107,6 +108,7 @@ int main(void)
         return 1;
     }
     GIFunctionInfo *fiTypeFromName = (GIFunctionInfo *)biTypeFromName;
+
 
     GError *error = NULL;
 
