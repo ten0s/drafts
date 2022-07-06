@@ -4,31 +4,46 @@
 
 #define LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
 
+void print_deps(GIRepository *repo, const char *name) {
+    g_printf("%s deps:\n", name);
+    gchar** deps = g_irepository_get_dependencies(repo, name);
+    gchar** iter = deps;
+    int i = 1;
+    while (*iter) {
+        g_printf("%d - %s\n", i, *iter);
+        g_free(*iter);
+        iter++;
+        i++;
+    }
+    g_free(deps);
+}
+
 int main(void)
 {
     GError *error = NULL;
 
     GIRepository *repo = g_irepository_get_default();
-    g_irepository_require(repo, "GObject", "2.0", 0, &error);
-    if (error) {
-        g_error("ERROR: %s\n", error->message);
-        return 1;
-    }
-
     g_irepository_require(repo, "GLib", "2.0", 0, &error);
     if (error) {
         g_error ("ERROR: %s\n", error->message);
         return 1;
     }
 
-    gchar** deps = g_irepository_get_dependencies(repo, "GObject");
-    gchar** iter = deps;
-    while (*iter) {
-        g_printf("GObject dependency: %s\n", *iter);
-        g_free(*iter);
-        iter++;
+    g_irepository_require(repo, "GObject", "2.0", 0, &error);
+    if (error) {
+        g_error("ERROR: %s\n", error->message);
+        return 1;
     }
-    g_free(deps);
+
+    g_irepository_require(repo, "Gdk", "3.0", 0, &error);
+    if (error) {
+        g_error ("ERROR: %s\n", error->message);
+        return 1;
+    }
+
+    print_deps(repo, "GLib");
+    print_deps(repo, "GObject");
+    print_deps(repo, "Gdk");
 
     GIBaseInfo *biValue = g_irepository_find_by_name(repo, "GObject", "Value");
     if (!biValue) {
