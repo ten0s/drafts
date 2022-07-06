@@ -29,25 +29,38 @@ gboolean require(GIRepository *repo, const char *ns, const char *ver) {
 
     gchar** deps = g_irepository_get_dependencies(repo, ns);
     gchar** iter = deps;
-    while (*iter) {
+    gboolean failed = FALSE;
+    while (*iter && !failed) {
         const char *dep = *iter;
 
         char *depNs = NULL;
         char *depVer = NULL;
         parse_ns_ver(dep, &depNs, &depVer);
         //g_printf("%s-%s\n", depNs, depVer);
-        require(repo, depNs, depVer);
+
+        failed = !require(repo, depNs, depVer);
 
         free(depNs);
         free(depVer);
 
+        iter++;
+    }
+
+    if (!failed) {
+        g_printf("%s-%s Loaded\n", ns, ver);
+    } else {
+        g_printf("%s-%s Failed\n", ns, ver);
+    }
+
+free:
+    iter = deps;
+    while (*iter) {
         g_free(*iter);
         iter++;
     }
     g_free(deps);
-    g_printf("%s-%s Loaded\n", ns, ver);
 
-    return TRUE;
+    return !failed;
 }
 
 int main(void)
