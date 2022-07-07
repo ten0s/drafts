@@ -358,6 +358,16 @@ int gdk_rgba(GIRepository *repo) {
         return 1;
     }
 
+    //
+    // It's very important to have the types right on Windows!
+    // Otherwise, it segfaults!
+    //
+
+    // GType g_type_from_name(const gchar *name)
+    // GValue* g_value_init(GValue* value, GType g_type)
+    // typedef gsize GType
+    // GIArgument { gsize .v_size }
+
     GType type = retval.v_size;
     g_printf("GObject.type_from_name(\"%s\") -> %ld\n", name, type);
 
