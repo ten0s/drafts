@@ -368,8 +368,8 @@ int gdk_rgba(GIRepository *repo) {
     // typedef gsize GType
     // GIArgument { gsize .v_size }
 
-    g_printf("sizeof(gulong) = %d\n", sizeof(gulong));
-    g_printf("sizeof(gsize)  = %d\n", sizeof(gsize));
+    g_printf("sizeof(gulong) = %ld\n", sizeof(gulong));
+    g_printf("sizeof(gsize)  = %ld\n", sizeof(gsize));
 
     // This segfaults on Windows
     // GType type = retval.v_ulong;
