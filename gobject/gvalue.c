@@ -36,8 +36,8 @@ int main(int argc, char *argv[])
     //gdk_init(&gdk_argc, &gdk_argv);
 
     /*
-      https://github.com/ten0s/node-gtk
-      See gvalue-from-gir.c
+      https://github.com/ten0s/node-gtk/tree/windows-build
+      See also gvalue-from-gir.c
 
       const color0 = new Gdk.RGBA({ red: 0.5, blue: 0.5, green: 0.5, alpha: 0.5 })
       const type = GObject.typeFromName('GdkRGBA')
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     g_printf("GdkRGBA type1: %ld\n", type1);
 
     // Returns 0 without the call above.
-    // Works if loaded from GIR. See gvalue-from-gir.c
+    // Works if loaded from GIR. See also gvalue-from-gir.c
     GType type2 = g_type_from_name("GdkRGBA");
     g_printf("GdkRGBA type2: %ld\n", type2);
 

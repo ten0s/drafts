@@ -289,7 +289,7 @@ int gdk_rgba(GIRepository *repo) {
     }
 
     /*
-      https://github.com/ten0s/node-gtk
+      https://github.com/ten0s/node-gtk/tree/windows-build
 
       const color0 = new Gdk.RGBA({ red: 0.5, blue: 0.5, green: 0.5, alpha: 0.5 })
       const type = GObject.typeFromName('GdkRGBA')
