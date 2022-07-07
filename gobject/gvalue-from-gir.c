@@ -125,7 +125,7 @@ int gobject_value(GIRepository *repo) {
 
     GIArgument argsInit[] = {
         { .v_pointer = val            },
-        { .v_ulong   = G_TYPE_STRING  },
+        { .v_size    = G_TYPE_STRING  },
     };
     if (!g_function_info_invoke(
             fiValueInit,
@@ -358,7 +358,7 @@ int gdk_rgba(GIRepository *repo) {
         return 1;
     }
 
-    gulong type = retval.v_ulong;
+    GType type = retval.v_size;
     g_printf("GObject.type_from_name(\"%s\") -> %ld\n", name, type);
 
     //
@@ -375,7 +375,7 @@ int gdk_rgba(GIRepository *repo) {
 
     GIArgument argsInit[] = {
         { .v_pointer = val },
-        { .v_ulong   = type },
+        { .v_size    = type },
     };
     if (!g_function_info_invoke(
             fiValueInit,
