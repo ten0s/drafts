@@ -12,10 +12,10 @@ run: compile
 	./gvalue-from-gir
 
 gvalue: gvalue.c
-	gcc -g -o gvalue gvalue.c `pkg-config --libs --cflags gobject-2.0 gdk-3.0`
+	gcc -g -Wall -o gvalue gvalue.c `pkg-config --libs --cflags gobject-2.0 gdk-3.0`
 
 gvalue-from-gir: gvalue-from-gir.c debug.c
-	 gcc -g -o gvalue-from-gir debug.c gvalue-from-gir.c `pkg-config --libs --cflags gobject-introspection-1.0`
+	 gcc -g -Wall -o gvalue-from-gir debug.c gvalue-from-gir.c `pkg-config --libs --cflags gobject-introspection-1.0`
 
 clean:
 	rm -f gvalue gvalue-from-gir

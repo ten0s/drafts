@@ -17,13 +17,13 @@ dlls: compile
 	ldd gvalue.exe | grep mingw | sed -E  's#[^/]*(/.*\.dll).*#\1#' | sort -u
 
 glib: glib.c
-	gcc -g -o glib glib.c `pkg-config --libs --cflags gobject-2.0`
+	gcc -g -Wall -o glib glib.c `pkg-config --libs --cflags gobject-2.0`
 
 gvalue: gvalue.c
-	gcc -g -o gvalue gvalue.c `pkg-config --libs --cflags gobject-2.0 gdk-3.0`
+	gcc -g -Wall -o gvalue gvalue.c `pkg-config --libs --cflags gobject-2.0 gdk-3.0`
 
 gvalue-from-gir: gvalue-from-gir.c debug.c
-	 gcc -g -o gvalue-from-gir debug.c gvalue-from-gir.c `pkg-config --libs --cflags gobject-introspection-1.0`
+	 gcc -g -Wall -o gvalue-from-gir debug.c gvalue-from-gir.c `pkg-config --libs --cflags gobject-introspection-1.0`
 
 clean:
 	rm -f gvalue.exe gvalue-from-gir.exe

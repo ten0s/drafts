@@ -15,10 +15,10 @@ dlls: compile
 	ldd hello-gtk.exe hello-gtk-cairo.exe | grep mingw | sed -E  's#[^/]*(/.*\.dll).*#\1#' | sort -u
 
 hello-gtk.exe: hello-gtk.c
-	gcc -o hello-gtk hello-gtk.c `pkg-config --libs --cflags gtk+-3.0`
+	gcc -g -Wall -o hello-gtk hello-gtk.c `pkg-config --libs --cflags gtk+-3.0`
 
 hello-gtk-cairo.exe: hello-gtk-cairo.c
-	gcc -o hello-gtk-cairo hello-gtk-cairo.c `pkg-config --libs --cflags gtk+-3.0`
+	gcc -g -Wall -o hello-gtk-cairo hello-gtk-cairo.c `pkg-config --libs --cflags gtk+-3.0`
 
 clean:
 	rm -f hello-gtk.exe hello-gtk-cairo.exe
